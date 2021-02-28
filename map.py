@@ -191,13 +191,23 @@ def sweep(points  = 12, precise = False, gridsize = 139):
 	return m
 
 def test():
-	m = sweep(50)
+	N = 139
+	m = sweep(50, gridsize = N)
 	cv2.imwrite("test.png", m)
 	fc.forward(10)
 	time.sleep(0.5)
 	fc.forward(0)
+
+	# our predicted n is m shifted vertically + 10
+	mprime = np.zeros(m.shape, m.dtype)
+	mprime[10:, :] = m[0:(N-10), :]
+	cv2.imwrite("test2-guess.png", mprime)
+
 	n = sweep(50)
 	cv2.imwrite("test2.png", n)
+
+	diff = np.abs(n - mprime)
+	cv2.imwrite("diff.png", diff)
 
 def turnAngle(angle):
 	if (angle > 0): turnLeftAngle(angle)
