@@ -1,3 +1,5 @@
+## CS498 IOT Lab 1 Part 1
+## rdb4/rdbisch@gmail.com
 import picar_4wd as fc
 import numpy as np
 import time
@@ -46,25 +48,6 @@ def my_getDistance():
 	cm = (343.0/2.0) * (100.0) * delta  # m/s * (cm/m) * time = cm
 	#if cm > 150: cm = 0   
 	return cm
-
-def sweep(delta = 15, precise = False):
-	# My servo is mounted wrong by a tooth? So I adjust 
-    # by 8 degrees
-
-	distances = {}
-	maxD = -2	# The biggest ditance we've seen so far
-	maxA = 0	# The angle that produced the biggest distance
-	angle = -90 + SERVO_OFFSET
-	while (angle <= 90 + SERVO_OFFSET):
-		setAngle(angle)
-		d = getDistance(precise)
-		if d > maxD:
-			maxD = d
-			maxA = angle
-		distances[angle] = d
-		angle = angle + delta
-	setAngle(0)
-	return { "max": maxA, "sweep": distances, "delta": delta, "precise": precise }
 
 def turnAngle(angle):
 	if (angle > 0): turnLeftAngle(angle)

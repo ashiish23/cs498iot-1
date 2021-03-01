@@ -86,12 +86,13 @@ def setBackground(N = 139):
 
 	return m
 
+# This will sweep the sensor over a grid and return a cartesian
+#  coordinate.  Passing in precise will use a higher precision but slower
+#  to use sensor reading.
 def sweep(points  = 12, precise = False, gridsize = 201, debug = False):
 	m = setBackground(gridsize)
 	#m = np.zeros((gridsize, gridsize, 3), 'int32')
 	distances = {}
-	maxD = -2	# The biggest ditance we've seen so far
-	maxA = 0	# The angle that produced the biggest distance
 	lastReadingGood = False
 	state = 0
 	arcPoints = []
@@ -187,48 +188,6 @@ def sweep(points  = 12, precise = False, gridsize = 201, debug = False):
 	setAngle(0)
 	m[gridsize//2, gridsize//2] = (255, 255, 255)
 	return m
-
-def test():
-	#camera = PiCamera()
-	N = 139
-	m = sweep(50, gridsize = N)
-	cv2.imwrite("test.png", m)
-
-	# forward movement ####
-	if None:
-		fc.forward(10)
-		time.sleep(0.5)
-		fc.forward(0)
-		# our predicted n is m shifted vertically + 10
-		mprime = np.zeros(m.shape, m.dtype)
-		mprime[10:, :] = m[0:(N-10), :]
-		cv2.imwrite("test2-guess.png", mprime)
-
-	# Rotate left
-	elif None:
-		image_center = tuple(np.array(m.shape[1::-1]) / 2)
-		rot_mat = cv2.getRotationMatrix2D(image_center, -15, 1.0)
-		mm = m.astype('float')/256.0
-		mprime = cv2.warpAffine(mm, rot_mat, m.shape[1::-1], flags=cv2.INTER_LINEAR)
-		mprime = (256*mprime).astype('int32')
-		cv2.imwrite("test2-guess.png", mprime)
-		turnLeftAngle(15)
-		n = sweep(50)
-		cv2.imwrite("test2.png", n)
-
-	# Rotate Right
-	image_center = tuple(np.array(m.shape[1::-1]) / 2)
-	rot_mat = cv2.getRotationMatrix2D(image_center, 15, 1.0)
-	mm = m.astype('float')/256.0
-	mprime = cv2.warpAffine(mm, rot_mat, m.shape[1::-1], flags=cv2.INTER_LINEAR)
-	mprime = (256*mprime).astype('int32')
-	cv2.imwrite("test2-guess.png", mprime)
-	turnRightAngle(15)
-	n = sweep(50)
-	cv2.imwrite("test2.png", n)
-
-	# Rotate Right
-		
 
 def mapTheWorld():
 	N = 139//2
