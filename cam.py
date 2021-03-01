@@ -104,34 +104,33 @@ def annotate_objects(annotator, results, labels):
                    '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
     print('%s\n%.2f' % (labels[obj['class_id']], obj['score']))
 
+def setup():
+	global labels, interpreter
+	global input_height, input_width
+	labels = load_labels("coco_labels.txt")
+	interpreter = Interpreter("detect.tflite")
+	interpreter.allocate_tensors()
+	_, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
-def main():
-  labels = load_labels("coco_labels.txt")
-  interpreter = Interpreter("detect.tflite")
-  interpreter.allocate_tensors()
-  _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
-
-  with picamera.PiCamera(
-      resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=1) as camera:
-      stream = io.BytesIO()
-      annotator = Annotator(camera)
-      for _ in camera.capture_continuous(
-          stream, format='jpeg', use_video_port=True):
-        stream.seek(0)
-        image = Image.open(stream).convert('RGB').resize(
-            (input_width, input_height), Image.ANTIALIAS)
-        start_time = time.monotonic()
-        results = detect_objects(interpreter, image, 0.4)
-        print(results)
-        elapsed_ms = (time.monotonic() - start_time) * 1000
-
-        annotator.clear()
-        annotate_objects(annotator, results, labels)
-        annotator.text([5, 0], '%.1fms' % (elapsed_ms))
-        annotator.update()
-
-        stream.seek(0)
-        stream.truncate()
+def inference(image):
+	image = image.convert('RGB').resize((input_width, input_height), Image.ANTIALIAS)
+	image.save("test2.png")
+	results = detect_objects(interpreter, image, 0.1)
+	new_results = []
+	for r in results:
+		new_results = new_results + [(labels[r['class_id']], r['score'])]
+	return new_results
 
 if __name__ == '__main__':
-  main()
+	setup()
+	
+	with picamera.PiCamera(resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=1) as camera:
+		stream = io.BytesIO()
+		for _ in camera.capture_continuous(stream, format='jpeg', use_video_port=True):
+			stream.seek(0)
+			image = Image.open(stream)
+			image.save("test.png")
+			print(inference(image))
+			stream.seek(0)
+			stream.truncate()
+

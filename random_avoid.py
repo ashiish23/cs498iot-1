@@ -103,7 +103,7 @@ def state1(tick, clear = 20, speed = 10):
 
 def state2(tick, clear = 20, speed = 10):
 	fc.backward(speed)
-	time.sleep(0.25)
+	time.sleep(0.50)
 	fc.backward(0)
 
 	# pick random angle 
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 	tick = 0
 	state = state1
 
-	while tick < 15:
+	while tick < 150:
 		nextState = state(tick, clear, speed)
 		tick = tick + 1
 		state = nextState
